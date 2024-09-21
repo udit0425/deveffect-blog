@@ -29,3 +29,8 @@ jobs:
 
       - name: Check SSH Key Permissions
         run: ls -l ~/.ssh/
+
+      - name: Check EC2 Host
+        run: echo "EC2_HOST:${{ secrets.EC2_HOST }}"
+
+        
