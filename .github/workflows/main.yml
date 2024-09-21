@@ -23,6 +23,9 @@ jobs:
           echo "${{ secrets.AWS_SSH_KEY }}" > ~/.ssh/deveffect_key.pem
           chmod 600 ~/.ssh/deveffect_key.pem
 
+      - name: Verify SSH Key
+        run: ls -l ~/.ssh/
+
       # Build Frontend (React App)
       - name: Build frontend
         working-directory: ./frontend  # Adjust the path to your frontend folder
