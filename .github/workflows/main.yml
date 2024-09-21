@@ -1,36 +1,40 @@
-name: Build and Deploy to AWS S3
+name: Frontend Test and Build
 
 on:
   push:
     branches:
-      - main
+      - main  # Run tests and build on every push to the main branch
+  pull_request:
+    branches:
+      - main  # Run on pull requests targeting the main branch
+  workflow_dispatch:  # Allow manual trigger of the workflow
 
 jobs:
-  build-and-deploy:
+  frontend:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step 2: Set up Node.js environment
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '18'  # Specify the Node.js version
 
-      - name: Install frontend dependencies
-        working-directory: ./frontend
-        run: npm i
+      # Step 3: Install frontend dependencies
+      - name: Install dependencies
+        working-directory: ./frontend  # Adjust this path if needed
+        run: npm ci  # Use npm ci for a clean install
 
+      # Step 4: Run frontend tests
+      - name: Run frontend tests
+        working-directory: ./frontend  # Adjust this path if needed
+        run: npm test  # Assuming you have a test script in package.json
+
+      # Step 5: Build frontend
       - name: Build frontend
-        working-directory: ./frontend
-        run: npm start
-
-      - name: Install backend dependencies
-        working-directory: ./backend
-        run: npm i
-
-      - name: Build backend
-        working-directory: ./backend
-        run: node ./index.js
-
+        working-directory: ./frontend  # Adjust this path if needed
+        run: npm run build
