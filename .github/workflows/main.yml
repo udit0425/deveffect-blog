@@ -10,57 +10,41 @@ on:
   workflow_dispatch:  # Allow manual trigger of the workflow
 
 jobs:
-  frontend:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js environment
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'  # Specify the Node.js version
+      - name: Install SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AWS_SSH_KEY }}" > ~/.ssh/deploy_key.pem
+          chmod 600 ~/.ssh/deploy_key.pem
 
-      # Step 3: Install frontend dependencies
-      - name: Install frontend dependencies
-        working-directory: ./frontend  # Adjust this path if needed
-        run: npm install  # Use npm ci for a clean install
-
-      # Step 4: Build frontend
+      # Build Frontend (React App)
       - name: Build frontend
-        working-directory: ./frontend  # Adjust this path if needed
-        run: npm run build
-
-      # Step 5: Install backend dependencies
-      - name: Install backend dependencies
-        working-directory: ./backend  # Adjust this path if needed
-        run: npm ci  # Clean install for CI environments
-
-      # Step 6: Upload Frontend to AWS S3
-      - name: Upload Frontend to AWS S3
+        working-directory: ./frontend  # Adjust the path to your frontend folder
         run: |
-          aws s3 sync ./frontend/build s3://deveffect-blog/ --delete
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+          npm install
+          npm run build
 
-      # Step 7: Upload Backend to AWS S3 (if applicable)
-      - name: Upload Backend to AWS S3
+      # Upload Frontend Files to EC2
+      - name: Upload frontend to EC2
         run: |
-          aws s3 sync ./backend s3://deveffect-blog/static --delete
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+          scp -i ~/.ssh/deploy_key.pem -P ${{ secrets.SSH_PORT }} -r ./frontend/build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.FRONTEND_PATH }}
 
-      # Optional: Run backend server (if needed for tests)
-      - name: Run backend server
-        working-directory: ./backend  # Adjust this path if needed
+      # Upload Backend Files to EC2
+      - name: Upload backend to EC2
         run: |
-          npm start &  # Start the backend server in the background
-          sleep 5  # Wait for the server to initialize
-        continue-on-error: true  # Allows the pipeline to continue if the server crashes
+          scp -i ~/.ssh/deploy_key.pem -P ${{ secrets.SSH_PORT }} -r ./backend/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.BACKEND_PATH }}
+
+      # SSH into EC2 and run backend setup
+      - name: SSH into EC2 and run backend
+        run: |
+          ssh -i ~/.ssh/deploy_key.pem -p ${{ secrets.SSH_PORT }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            cd ${{ secrets.BACKEND_PATH }}
+            npm install
+            pm2 restart all || pm2 start npm --name "backend" -- start
+          EOF
