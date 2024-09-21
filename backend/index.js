@@ -10,7 +10,11 @@ const app = express();
 const port = 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', // Allow requests from your frontend
+  methods: ['GET', 'POST', 'DELETE', 'PUT'], // Specify allowed methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+}));
 app.use(bodyParser.json());
 
 // MongoDB connection
@@ -40,13 +44,13 @@ app.post("/api/blogs", async (req, res) => {
 });
 
 app.get("/api/blogs", async (req, res) => {
-    try {
-      const blogs = await Blog.find(); // Retrieve all blogs from the database
-      res.status(200).json(blogs);
-    } catch (err) {
-      res.status(500).json({ message: "Error retrieving blogs", error: err });
-    }
-  });
+  try {
+    const blogs = await Blog.find(); // Retrieve all blogs from the database
+    res.status(200).json(blogs);
+  } catch (err) {
+    res.status(500).json({ message: "Error retrieving blogs", error: err });
+  }
+});
 
 // Start the server
 app.listen(port, () => {
