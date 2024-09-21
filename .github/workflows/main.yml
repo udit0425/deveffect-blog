@@ -20,8 +20,8 @@ jobs:
       - name: Install SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.AWS_SSH_KEY }}" > ~/.ssh/deploy_key.pem
-          chmod 600 ~/.ssh/deploy_key.pem
+          echo "${{ secrets.AWS_SSH_KEY }}" > ~/.ssh/deveffect-key.pem
+          chmod 600 ~/.ssh/deveffect-key.pem
           
       - name: Add EC2 Host to Known Hosts
         run: |
