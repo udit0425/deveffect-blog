@@ -30,6 +30,13 @@ jobs:
           npm install
           npm run build
 
+      - name: Check SSH Key
+        run: |
+          ls -la ~/.ssh/
+          cat ~/.ssh/deveffect-key.pem
+          ssh -i ~/.ssh/deveffect-key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} -p ${{ secrets.SSH_PORT }} -v
+
+
       # Upload Frontend Files to EC2
       - name: Upload frontend to EC2
         run: |
