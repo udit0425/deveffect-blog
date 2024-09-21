@@ -46,11 +46,6 @@ jobs:
           sleep 5  # Wait for the server to initialize
         continue-on-error: true  # Optional: Allows the pipeline to continue if the server crashes
 
-      # Optional: Verify the backend is running (e.g., health check)
-      - name: Verify backend health
-        run: curl http://localhost:3000/health  # Adjust to your API's health check route
-        continue-on-error: true 
-
       - name: Upload Frontend to AWS S3
         run: |
           aws s3 sync ./frontend/build s3://deveffect-blog/ --delete
@@ -62,7 +57,7 @@ jobs:
       # Step 4: Upload Backend to AWS S3 (if applicable)
       - name: Upload Backend to AWS S3
         run: |
-          aws s3 sync ./backend/static s3://deveffect-blog/static --delete
+          aws s3 sync ./backend s3://deveffect-blog/static --delete
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
