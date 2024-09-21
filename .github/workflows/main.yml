@@ -21,7 +21,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.AWS_SSH_KEY }}" > ~/.ssh/deveffect-key.pem
-          chmod 400 ~/.ssh/deveffect_key.pem
+          chmod 600 ~/.ssh/deveffect_key.pem
 
       # Build Frontend (React App)
       - name: Build frontend
