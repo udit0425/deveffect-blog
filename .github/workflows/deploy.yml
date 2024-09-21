@@ -1,0 +1,46 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AWS_SSH_KEY }}" > ~/.ssh/deploy_key.pem
+          chmod 600 ~/.ssh/deploy_key.pem
+
+      # Build Frontend (React App)
+      - name: Build frontend
+        working-directory: ./frontend  # Adjust the path to your frontend folder
+        run: |
+          npm install
+          npm run build
+
+      # Upload Frontend Files to EC2
+      - name: Upload frontend to EC2
+        run: |
+          scp -i ~/.ssh/deploy_key.pem -P ${{ secrets.SSH_PORT }} -r ./frontend/build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.FRONTEND_PATH }}
+
+      # Upload Backend Files to EC2
+      - name: Upload backend to EC2
+        run: |
+          scp -i ~/.ssh/deploy_key.pem -P ${{ secrets.SSH_PORT }} -r ./backend/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.BACKEND_PATH }}
+
+      # SSH into EC2 and run backend setup
+      - name: SSH into EC2 and run backend
+        run: |
+          ssh -i ~/.ssh/deploy_key.pem -p ${{ secrets.SSH_PORT }} ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            cd ${{ secrets.BACKEND_PATH }}
+            npm install
+            pm2 restart all || pm2 start npm --name "backend" -- start
+          EOF
