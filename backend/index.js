@@ -12,7 +12,7 @@ const port = 5000;
 // Middleware
 app.use(cors({
   origin: 'http://localhost:3000', // Allow requests from your frontend
-  methods: ['GET', 'POST', 'DELETE', 'PUT'], // Specify allowed methods
+  methods: ['GET', 'POST'], // Specify allowed methods
   allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
 }));
 app.use(bodyParser.json());
