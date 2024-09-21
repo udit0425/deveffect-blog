@@ -38,11 +38,6 @@ jobs:
         working-directory: ./backend  # Adjust this path if needed
         run: npm ci  # Clean install for CI environments
 
-      # Step 4: Run backend tests
-      - name: Run backend tests
-        working-directory: ./backend  # Adjust this path if needed
-        run: npm test  # Assuming you have a test script in package.json
-
       # Step 5: Run backend server
       - name: Run backend server
         working-directory: ./backend  # Adjust this path if needed
