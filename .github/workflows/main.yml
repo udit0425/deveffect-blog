@@ -44,6 +44,6 @@ jobs:
       # Upload Frontend Files to EC2
       - name: Upload frontend to EC2
         run: |
-          scp -v -i ~/.ssh/deploy_key.pem -P ${{ secrets.SSH_PORT }} -r ./frontend/build/* ubuntu@${{ secrets.EC2_HOST }}:${{ secrets.FRONTEND_PATH }}
+          scp -v -i ~/.ssh/deveffect-key.pem -P ${{ secrets.SSH_PORT }} -r ./frontend/build/* ubuntu@${{ secrets.EC2_HOST }}:${{ secrets.FRONTEND_PATH }}
 
         
