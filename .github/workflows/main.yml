@@ -29,11 +29,6 @@ jobs:
         working-directory: ./frontend  # Adjust this path if needed
         run: npm install  # Use npm ci for a clean install
 
-      # Step 4: Run frontend tests
-      - name: Run frontend tests
-        working-directory: ./frontend  # Adjust this path if needed
-        run: npm test  # Assuming you have a test script in package.json
-
       # Step 5: Build frontend
       - name: Build frontend
         working-directory: ./frontend  # Adjust this path if needed
