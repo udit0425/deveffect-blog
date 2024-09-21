@@ -38,7 +38,7 @@ jobs:
       # Upload Backend Files to EC2
       - name: Upload backend to EC2
         run: |
-          scp -i ~/.ssh/deveffect-key.pem -P ${{ secrets.SSH_PORT }} -r ./backend/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.BACKEND_PATH }}
+          scp -v -i ~/.ssh/deveffect-key.pem -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} -r ./frontend/build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.FRONTEND_PATH }}
 
       # SSH into EC2 and run backend setup
       - name: SSH into EC2 and run backend
