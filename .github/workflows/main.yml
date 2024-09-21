@@ -33,22 +33,7 @@ jobs:
       - name: Build frontend
         working-directory: ./frontend  # Adjust this path if needed
         run: npm run build
-jobs:
-  backend:
-    runs-on: ubuntu-latest
 
-    steps:
-      # Step 1: Checkout code
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Step 2: Set up Node.js environment
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'  # Specify the Node.js version
-
-      # Step 3: Install backend dependencies
       - name: Install dependencies
         working-directory: ./backend  # Adjust this path if needed
         run: npm ci  # Clean install for CI environments
@@ -69,4 +54,4 @@ jobs:
       # Optional: Verify the backend is running (e.g., health check)
       - name: Verify backend health
         run: curl http://localhost:3000/health  # Adjust to your API's health check route
-        continue-on-error: true  # Ignore if the server isn't running correctly
+        continue-on-error: true 
