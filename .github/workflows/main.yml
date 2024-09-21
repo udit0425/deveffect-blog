@@ -23,22 +23,30 @@ jobs:
           echo "${{ secrets.AWS_SSH_KEY }}" > ~/.ssh/deploy_key.pem
           chmod 600 ~/.ssh/deploy_key.pem
 
+      - name: Add EC2 Host to Known Hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Check SSH Key Permissions
+        run: ls -l ~/.ssh/
+
       # Build Frontend (React App)
       - name: Build frontend
-        working-directory: ./frontend  # Adjust the path to your frontend folder
+        working-directory: ./frontend
         run: |
           npm install
           npm run build
+          ls -la ./build
 
       # Upload Frontend Files to EC2
       - name: Upload frontend to EC2
         run: |
-          scp -i ~/.ssh/deploy_key.pem -P ${{ secrets.SSH_PORT }} -r ./frontend/build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.FRONTEND_PATH }}
+          scp -v -i ~/.ssh/deploy_key.pem -P ${{ secrets.SSH_PORT }} -r ./frontend/build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.FRONTEND_PATH }}
 
       # Upload Backend Files to EC2
       - name: Upload backend to EC2
         run: |
-          scp -i ~/.ssh/deploy_key.pem -P ${{ secrets.SSH_PORT }} -r ./backend/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.BACKEND_PATH }}
+          scp -v -i ~/.ssh/deploy_key.pem -P ${{ secrets.SSH_PORT }} -r ./backend/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.BACKEND_PATH }}
 
       # SSH into EC2 and run backend setup
       - name: SSH into EC2 and run backend
